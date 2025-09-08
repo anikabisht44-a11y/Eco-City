@@ -22,7 +22,7 @@ EcoCity Builder is a lightweight, browser-based city-building simulation inspire
 
 **🚀 How to Play**
 
-Start the game – you’ll see an intro message in the sky with narration.
+Start the game 
 
 Use the sidebar to select buildings from categories (Nature, Transport, Residential, etc.).
 
