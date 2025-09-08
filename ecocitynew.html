@@ -1,0 +1,1314 @@
+     <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoCity Builder - Indian Environmental City Simulator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #ffffff;
+            color: #333333;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .game-container {
+            display: flex;
+            height: 100vh;
+            /* Updated gradient to white with green accents */
+            background: linear-gradient(135deg, #ffffff 0%, #f8fdfb 100%);
+        }
+
+        .sidebar {
+            width: 300px;
+            background: #f5f5f5;
+            /* Updated border color to green */
+            border-right: 2px solid #50c878;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .sidebar-header {
+            background: #ffffff;
+            padding: 20px;
+            /* Updated border color to green */
+            border-bottom: 1px solid #50c878;
+        }
+
+        .sidebar-header h1 {
+            /* Updated text color to green */
+            color: #50c878;
+            font-size: 1.8em;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .sidebar-header p {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .stats-section {
+            padding: 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 8px 12px;
+            background: #ffffff;
+            border-radius: 6px;
+            /* Updated border color to green */
+            border-left: 3px solid #50c878;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .stat-label {
+            font-weight: 500;
+            color: #555;
+        }
+
+        .stat-value {
+            font-weight: 600;
+            /* Updated value color to green */
+            color: #50c878;
+        }
+
+        .building-categories {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .category {
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .category-header {
+            background: #ffffff;
+            padding: 15px 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            /* Updated text color to green */
+            color: #50c878;
+            /* Updated border color to green */
+            border-left: 4px solid #50c878;
+        }
+
+        .category-header:hover {
+            /* Updated hover background to light green */
+            background: #f0fdf4;
+        }
+
+        .category-content {
+            display: none;
+            padding: 10px;
+        }
+
+        .category.active .category-content {
+            display: block;
+        }
+
+        .building-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            margin: 4px 0;
+            background: #ffffff;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .building-item:hover {
+            /* Updated hover background to light green */
+            background: #f0fdf4;
+            /* Updated border color to green */
+            border-color: #50c878;
+            transform: translateY(-1px);
+            /* Updated shadow color to green */
+            box-shadow: 0 4px 8px rgba(80, 200, 120, 0.2);
+        }
+
+        .building-item.selected {
+            /* Updated selected background to green */
+            background: #50c878;
+            color: #ffffff;
+        }
+
+        .building-icon {
+            font-size: 32px;
+            margin-right: 12px;
+            width: 40px;
+            height: 40px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* Updated gradient to light green */
+            background: linear-gradient(135deg, #f0fdf4, #e6ffed);
+            border-radius: 8px;
+            /* Updated border color to green */
+            border: 2px solid #50c878;
+            /* Updated shadow color to green */
+            filter: drop-shadow(0 2px 4px rgba(80, 200, 120, 0.3));
+            transition: all 0.3s ease;
+        }
+
+        .building-item:hover .building-icon {
+            transform: scale(1.1) rotate(5deg);
+            /* Updated shadow color to green */
+            filter: drop-shadow(0 4px 8px rgba(80, 200, 120, 0.4));
+        }
+
+        .building-item.selected .building-icon {
+            /* Updated selected gradient to light green */
+            background: linear-gradient(135deg, #ffffff, #f0fdf4);
+            border-color: #ffffff;
+        }
+
+        .building-info {
+            flex: 1;
+        }
+
+        .building-name {
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .building-effects {
+            font-size: 0.8em;
+            opacity: 0.7;
+        }
+
+        .main-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #ffffff;
+        }
+
+        .top-toolbar {
+            height: 60px;
+            background: #f5f5f5;
+            /* Updated border color to green */
+            border-bottom: 2px solid #50c878;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            gap: 20px;
+        }
+
+        .toolbar-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toolbar-button {
+            background: #ffffff;
+            /* Updated border color to green */
+            border: 1px solid #50c878;
+            /* Updated text color to green */
+            color: #50c878;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+
+        .toolbar-button:hover {
+            /* Updated hover background to green */
+            background: #50c878;
+            color: #ffffff;
+        }
+
+        .info-overlay-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .overlay-btn {
+            background: #ffffff;
+            border: 1px solid #ccc;
+            color: #666;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8em;
+            transition: all 0.2s;
+        }
+
+        .overlay-btn.active {
+            /* Updated active state to green */
+            background: #50c878;
+            color: #ffffff;
+            /* Updated border color to green */
+            border-color: #50c878;
+        }
+         /* 🌞 Sun & Clouds section */
+    .sky {
+      position: relative;
+      width: 100%;
+      height: 196px;
+      background: linear-gradient(to bottom, #cceeff, #ffffff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 10px;
+      border-radius: 0 0 12px 12px;
+      overflow: hidden;
+    }
+
+    .sun {
+      width: 95px;
+      height: 95px;
+      background: #FFD93D;
+      border-radius: 50%;
+      position: absolute;
+      top: 60px;
+      left: 40px;
+      box-shadow: 0 0 40px rgba(255, 217, 61, 0.7);
+    }
+
+    .cloud {
+      width: 95px;
+      height: 70px;
+      background: #fff;
+      border-radius: 50px;
+      position: absolute;
+      top: 50px;
+      box-shadow: 30px 10px 0 -10px #fff, 60px 5px 0 -15px #fff;
+    }
+
+    .cloud1 { left: 150px; animation: float 8s linear infinite; }
+    .cloud2 { left: 350px; animation: float 12s linear infinite; }
+
+    @keyframes float {
+      from { transform: translateX(-100px); }
+      to { transform: translateX(100vw); }
+    }
+
+        .city-view {
+            flex: 1;
+            position: relative;
+            /* Updated city view background to light green */
+            background: #f0fdf4;
+            background-image: 
+                /* Updated gradient colors to green */
+                radial-gradient(circle at 25% 25%, rgba(80, 200, 120, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(80, 200, 120, 0.05) 0%, transparent 50%);
+        }
+
+        .city-grid {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotateX(60deg) rotateY(0deg);
+            display: grid;
+            grid-template-columns: repeat(15, 45px);
+            grid-template-rows: repeat(20, 45px);
+            gap: 2px;
+            perspective: 1000px;
+        }
+
+        .grid-cell {
+            width: 40px;
+            height: 40px;
+            /* Updated grid cell background to green */
+            background: rgba(80, 200, 120, 0.1);
+            /* Updated border color to green */
+            border: 1px solid rgba(80, 200, 120, 0.3);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            transform-style: preserve-3d;
+        }
+
+        .grid-cell:hover {
+            /* Updated hover background to green */
+            background: rgba(80, 200, 120, 0.3);
+            /* Updated border color to green */
+            border-color: #50c878;
+            transform: translateZ(5px);
+        }
+
+        .grid-cell.occupied {
+            /* Updated occupied cell styling to green */
+            background: rgba(80, 200, 120, 0.2);
+            /* Updated border color to green */
+            border-color: #50c878;
+        }
+
+        .grid-cell.river {
+            background: rgba(30, 144, 255, 0.3);
+            border-color: #1E90FF;
+        }
+
+        .building-sprite {
+            font-size: 32px;
+            /* Updated shadow color to green */
+            filter: drop-shadow(2px 2px 6px rgba(80, 200, 120, 0.4));
+            animation: buildingPulse 2s ease-in-out infinite;
+            /* Updated gradient to light green */
+            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(240,253,244,0.9));
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* Updated border color to green */
+            border: 2px solid rgba(80, 200, 120, 0.5);
+        }
+
+        @keyframes buildingPulse {
+            0%, 100% { 
+                transform: scale(1);
+                /* Updated shadow color to green */
+                filter: drop-shadow(2px 2px 6px rgba(80, 200, 120, 0.4));
+            }
+            50% { 
+                transform: scale(1.1);
+                /* Updated shadow color to green */
+                filter: drop-shadow(3px 3px 8px rgba(80, 200, 120, 0.6));
+            }
+        }
+
+        .info-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .info-overlay.active {
+            opacity: 1;
+        }
+
+        .pollution-overlay {
+            background: radial-gradient(circle, rgba(255, 0, 0, 0.3) 0%, transparent 70%);
+        }
+
+        .energy-overlay {
+            background: radial-gradient(circle, rgba(255, 255, 0, 0.3) 0%, transparent 70%);
+        }
+
+        .water-overlay {
+            background: radial-gradient(circle, rgba(0, 100, 255, 0.3) 0%, transparent 70%);
+        }
+
+        .happiness-overlay {
+            background: radial-gradient(circle, rgba(0, 255, 0, 0.3) 0%, transparent 70%);
+        }
+
+        .weather-effect {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .monsoon-rain {
+            background: linear-gradient(180deg, transparent 0%, rgba(100, 149, 237, 0.1) 100%);
+            animation: rainEffect 1s linear infinite;
+        }
+
+        @keyframes rainEffect {
+            0% { opacity: 0.3; }
+            50% { opacity: 0.7; }
+            100% { opacity: 0.3; }
+        }
+
+        .rain-drop {
+            position: absolute;
+            width: 2px;
+            height: 20px;
+            background: linear-gradient(to bottom, transparent, #6495ED);
+            animation: rainFall 0.8s linear infinite;
+        }
+
+        @keyframes rainFall {
+            0% { transform: translateY(-100vh); }
+            100% { transform: translateY(100vh); }
+        }
+
+        .info-panel {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 300px;
+            background: rgba(255, 255, 255, 0.95);
+            /* Updated border color to green */
+            border: 1px solid #50c878;
+            border-radius: 8px;
+            padding: 20px;
+            display: none;
+            /* Updated shadow color to green */
+            box-shadow: 0 4px 12px rgba(80, 200, 120, 0.2);
+        }
+
+        .info-panel.show {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .info-title {
+            /* Updated info title color to green */
+            color: #50c878;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .info-content {
+            color: #555;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+
+        .achievement-popup {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            /* Updated achievement background to green */
+            background: #50c878;
+            color: #ffffff;
+            padding: 15px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            transform: translateX(100%);
+            transition: transform 0.3s ease-out;
+            z-index: 1000;
+            /* Updated shadow color to green */
+            box-shadow: 0 4px 12px rgba(80, 200, 120, 0.3);
+        }
+
+        .achievement-popup.show {
+            transform: translateX(0);
+        }
+
+        .tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .tooltip.show {
+            opacity: 1;
+        }
+
+        /* Responsive design for mobile */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 250px;
+            }
+            
+            .city-grid {
+                grid-template-columns: repeat(12, 35px);
+                grid-template-rows: repeat(10, 35px);
+            }
+            
+            .grid-cell {
+                width: 35px;
+                height: 35px;
+            }
+        }
+        .game-intro {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 255, 255, 0.9);
+    color: #2e7d32;
+    font-family: 'Inter', sans-serif;
+    font-size: 1.2em;
+    font-weight: 600;
+    padding: 15px 25px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 6px 16px rgba(46, 125, 50, 0.3);
+    opacity: 0;
+    animation: fadeInOut 5s ease forwards;
+    max-width: 80%;
+    line-height: 1.5;
+    z-index: 50;
+}
+
+@keyframes fadeInOut {
+    0% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+    10% { opacity: 1; transform: translateX(-50%) translateY(0); }
+    80% { opacity: 1; transform: translateX(-50%) translateY(0); }
+    100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+}
+
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <!-- SimCity-style sidebar with Indian building categories -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h1>🇮🇳 EcoCity Builder</h1>
+                <p>Build a sustainable Indian city</p>
+            </div>
+
+            <div class="stats-section">
+                <div class="stat-item">
+                    <span class="stat-label">⚡ Energy</span>
+                    <span class="stat-value" id="energy">100</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">🌫️ Pollution</span>
+                    <span class="stat-value" id="pollution">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">💧 Water</span>
+                    <span class="stat-value" id="water">50</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">😊 Happiness</span>
+                    <span class="stat-value" id="happiness">50</span>
+                </div>
+            </div>
+
+            <div class="building-categories">
+                <div class="category active" data-category="nature">
+                    <div class="category-header">
+                        🌿 Nature & Trees
+                        <span>▼</span>
+                    </div>
+                    <div class="category-content" id="nature-buildings"></div>
+                </div>
+
+                <div class="category" data-category="energy">
+                    <div class="category-header">
+                        ⚡ Energy & Power
+                        <span>▶</span>
+                    </div>
+                    <div class="category-content" id="energy-buildings"></div>
+                </div>
+
+                <div class="category" data-category="water">
+                    <div class="category-header">
+                        💧 Water Management
+                        <span>▶</span>
+                    </div>
+                    <div class="category-content" id="water-buildings"></div>
+                </div>
+
+                <div class="category" data-category="transport">
+                    <div class="category-header">
+                        🚌 Transportation
+                        <span>▶</span>
+                    </div>
+                    <div class="category-content" id="transport-buildings"></div>
+                </div>
+
+                <div class="category" data-category="residential">
+                    <div class="category-header">
+                        🏠 Residential
+                        <span>▶</span>
+                    </div>
+                    <div class="category-content" id="residential-buildings"></div>
+                </div>
+
+                <div class="category" data-category="utility">
+                    <div class="category-header">
+                        ♻️ Utilities
+                        <span>▶</span>
+                    </div>
+                    <div class="category-content" id="utility-buildings"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main game area with SimCity-style interface -->
+        <div class="main-area">
+            <div class="top-toolbar">
+                <div class="toolbar-section">
+                    <button class="toolbar-button" onclick="resetCity()">🔄 Reset</button>
+                    <button class="toolbar-button" onclick="toggleWeather()">🌧️ Weather</button>
+                    <button class="toolbar-button" onclick="showStats()">📊 Stats</button>
+                </div>
+                
+                <div class="toolbar-section">
+                    <span style="color: #4CAF50; font-weight: 600;">Population: <span id="population">0</span></span>
+                </div>
+
+                <div class="info-overlay-controls">
+                    <button class="overlay-btn" onclick="toggleOverlay('pollution')">Pollution</button>
+                    <button class="overlay-btn" onclick="toggleOverlay('energy')">Energy</button>
+                    <button class="overlay-btn" onclick="toggleOverlay('water')">Water</button>
+                    <button class="overlay-btn" onclick="toggleOverlay('happiness')">Happiness</button>
+                </div>
+            </div>
+                  <!-- 🌞 Sky section -->
+      <div class="sky">
+        <div class="sun"></div>
+        <div class="cloud cloud1"></div>
+        <div class="cloud cloud2"></div>
+      </div>
+
+      <div class="game-intro" id="game-intro">
+    🌱 Welcome to <strong>EcoCity Builder</strong>! Plant trees, manage pollution, and keep your people happy while designing a city that thrives in harmony with nature. Can you create the ultimate green paradise?" 🌍
+</div>
+
+            <div class="city-view">
+                <div class="city-grid" id="city-grid"></div>
+                
+                <!-- Information overlays -->
+                <div class="info-overlay pollution-overlay" id="pollution-overlay"></div>
+                <div class="info-overlay energy-overlay" id="energy-overlay"></div>
+                <div class="info-overlay water-overlay" id="water-overlay"></div>
+                <div class="info-overlay happiness-overlay" id="happiness-overlay"></div>
+                
+                <!-- Weather effects -->
+                <div class="weather-effect" id="weather-effect"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Educational info panel -->
+    <div class="info-panel" id="info-panel">
+        <div class="info-title" id="info-title">Building Information</div>
+        <div class="info-content" id="info-content">Select a building to learn more about its environmental impact.</div>
+    </div>
+
+    <!-- Achievement popup -->
+    <div class="achievement-popup" id="achievement-popup"></div>
+
+    <!-- Tooltip -->
+    <div class="tooltip" id="tooltip"></div>
+
+    <script>
+        let gameState = {
+            energy: 100,
+            pollution: 0,
+            water: 50,
+            happiness: 50,
+            population: 0,
+            selectedBuilding: null,
+            buildings: [],
+            achievements: [],
+            weather: 'clear',
+            activeOverlay: null
+        };
+
+        const buildingTypes = {
+            // Nature & Trees
+            neem: {
+                name: 'Neem Tree',
+                icon: '🌳',
+                category: 'nature',
+                energy: 2,
+                pollution: -15,
+                water: -5,
+                happiness: 10,
+                population: 0,
+                description: 'Sacred neem trees purify air and provide natural pesticide. Known for medicinal properties.',
+                education: 'Neem trees can absorb 48 pounds of CO2 per year and are drought-resistant, perfect for Indian climate.'
+            },
+            banyan: {
+                name: 'Banyan Tree',
+                icon: '🌲',
+                category: 'nature',
+                energy: 5,
+                pollution: -25,
+                water: -10,
+                happiness: 20,
+                population: 0,
+                description: 'Massive banyan trees provide shade and oxygen for entire neighborhoods.',
+                education: 'A single banyan tree can provide oxygen for 10 people and cool the surrounding area by 5°C.'
+            },
+            peepal: {
+                name: 'Peepal Tree',
+                icon: '🍃',
+                category: 'nature',
+                energy: 3,
+                pollution: -20,
+                water: -3,
+                happiness: 15,
+                population: 0,
+                description: 'Sacred peepal trees release oxygen even at night, unlike most plants.',
+                education: 'Peepal trees are unique as they produce oxygen 24/7, making them ideal for urban pollution control.'
+            },
+            park: {
+                name: 'Community Park',
+                icon: '🏞️',
+                category: 'nature',
+                energy: 0,
+                pollution: -30,
+                water: -15,
+                happiness: 35,
+                population: 5,
+                description: 'Green spaces with native Indian plants and recreational facilities.',
+                education: 'Urban parks reduce city temperature by 2-8°C and improve mental health of residents.'
+            },
+
+            // Energy & Power
+            solar: {
+                name: 'Solar Panel Farm',
+                icon: '☀️',
+                category: 'energy',
+                energy: 50,
+                pollution: -5,
+                water: 0,
+                happiness: 10,
+                population: 2,
+                description: 'Harness abundant Indian sunlight for clean electricity generation.',
+                education: 'India receives 300+ sunny days annually. Solar power can meet 20% of energy needs by 2030.'
+            },
+            wind: {
+                name: 'Wind Turbine',
+                icon: '💨',
+                category: 'energy',
+                energy: 40,
+                pollution: -3,
+                water: 0,
+                happiness: 5,
+                population: 1,
+                description: 'Coastal and hill wind turbines generating renewable energy.',
+                education: 'India has 4th largest wind power capacity globally, with potential for 695 GW generation.'
+            },
+            biogas: {
+                name: 'Biogas Plant',
+                icon: '🔥',
+                category: 'energy',
+                energy: 30,
+                pollution: -20,
+                water: 5,
+                happiness: 15,
+                population: 3,
+                description: 'Convert organic waste into clean cooking gas and fertilizer.',
+                education: 'Biogas plants reduce methane emissions and provide clean cooking fuel for rural households.'
+            },
+
+            // Water Management
+            rainwater: {
+                name: 'Rainwater Harvesting',
+                icon: '🌧️',
+                category: 'water',
+                energy: -5,
+                pollution: -10,
+                water: 40,
+                happiness: 20,
+                population: 0,
+                description: 'Collect and store monsoon rainwater for year-round use.',
+                education: 'Rainwater harvesting can recharge groundwater and reduce flood risks during monsoons.'
+            },
+            well: {
+                name: 'Community Well',
+                icon: '🕳️',
+                category: 'water',
+                energy: -10,
+                pollution: 0,
+                water: 25,
+                happiness: 15,
+                population: 10,
+                description: 'Traditional water source with modern filtration systems.',
+                education: 'Community wells with proper maintenance can serve 200+ families sustainably.'
+            },
+            treatment: {
+                name: 'Water Treatment Plant',
+                icon: '🏭',
+                category: 'water',
+                energy: -20,
+                pollution: -30,
+                water: 60,
+                happiness: 25,
+                population: 0,
+                description: 'Advanced sewage treatment and water recycling facility.',
+                education: 'Modern treatment plants can recycle 90% of wastewater for irrigation and industrial use.'
+            },
+
+            // Transportation
+            metro: {
+                name: 'Metro Station',
+                icon: '🚇',
+                category: 'transport',
+                energy: -30,
+                pollution: -40,
+                water: 0,
+                happiness: 40,
+                population: 50,
+                description: 'Electric metro system reducing traffic congestion and emissions.',
+                education: 'Delhi Metro prevents 6.3 lakh tons of CO2 emissions annually by reducing car usage.'
+            },
+            bus: {
+                name: 'Electric Bus Stop',
+                icon: '🚌',
+                category: 'transport',
+                energy: -15,
+                pollution: -25,
+                water: 0,
+                happiness: 20,
+                population: 20,
+                description: 'Clean electric buses powered by renewable energy.',
+                education: 'Electric buses reduce air pollution by 80% compared to diesel buses in Indian cities.'
+            },
+            cycle: {
+                name: 'Cycle Sharing Hub',
+                icon: '🚲',
+                category: 'transport',
+                energy: 0,
+                pollution: -15,
+                water: 0,
+                happiness: 25,
+                population: 15,
+                description: 'Bicycle sharing system promoting eco-friendly transportation.',
+                education: 'Cycling reduces carbon footprint by 2.6 kg CO2 per day compared to car travel.'
+            },
+
+            // Residential
+            apartment: {
+                name: 'Green Apartment',
+                icon: '🏢',
+                category: 'residential',
+                energy: -10,
+                pollution: 5,
+                water: -20,
+                happiness: 30,
+                population: 40,
+                description: 'Eco-friendly apartments with solar panels and rainwater harvesting.',
+                education: 'Green buildings use 30% less energy and 50% less water than conventional buildings.'
+            },
+            house: {
+                name: 'Traditional House',
+                icon: '🏠',
+                category: 'residential',
+                energy: -5,
+                pollution: 3,
+                water: -10,
+                happiness: 25,
+                population: 8,
+                description: 'Traditional Indian homes with courtyards and natural ventilation.',
+                education: 'Traditional architecture uses passive cooling, reducing energy needs by 40%.'
+            },
+
+            // Utilities
+            recycle: {
+                name: 'Recycling Center',
+                icon: '♻️',
+                category: 'utility',
+                energy: -15,
+                pollution: -35,
+                water: -5,
+                happiness: 20,
+                population: 5,
+                description: 'Waste segregation and recycling facility reducing landfill burden.',
+                education: 'Recycling 1 ton of plastic saves 2000 liters of water and prevents ocean pollution.'
+            },
+            compost: {
+                name: 'Composting Unit',
+                icon: '🌱',
+                category: 'utility',
+                energy: -5,
+                pollution: -25,
+                water: 10,
+                happiness: 15,
+                population: 2,
+                description: 'Convert organic waste into nutrient-rich fertilizer for urban farming.',
+                education: 'Composting reduces methane emissions by 50% and creates valuable organic fertilizer.'
+            },
+            hospital: {
+                name: 'Green Hospital',
+                icon: '🏥',
+                category: 'utility',
+                energy: -25,
+                pollution: -10,
+                water: -15,
+                happiness: 50,
+                population: 0,
+                description: 'Healthcare facility with renewable energy and waste management.',
+                education: 'Green hospitals reduce environmental impact while providing better patient outcomes.'
+            }
+        };
+
+        const achievements = [
+            { id: 'first_tree', name: 'Tree Planter', description: 'Plant your first tree', condition: () => gameState.buildings.some(b => ['neem', 'banyan', 'peepal'].includes(b.type)) },
+            { id: 'solar_power', name: 'Solar Pioneer', description: 'Harness the power of Indian sun', condition: () => gameState.buildings.some(b => b.type === 'solar') },
+            { id: 'water_saver', name: 'Water Warrior', description: 'Implement rainwater harvesting', condition: () => gameState.buildings.some(b => b.type === 'rainwater') },
+            { id: 'clean_transport', name: 'Green Commuter', description: 'Build sustainable transport', condition: () => gameState.buildings.some(b => ['metro', 'bus', 'cycle'].includes(b.type)) },
+            { id: 'waste_manager', name: 'Waste Warrior', description: 'Set up waste management', condition: () => gameState.buildings.some(b => ['recycle', 'compost'].includes(b.type)) },
+            { id: 'population_100', name: 'Growing City', description: 'Reach 100 population', condition: () => gameState.population >= 100 },
+            { id: 'clean_air', name: 'Clean Air Champion', description: 'Reduce pollution below -100', condition: () => gameState.pollution <= -100 },
+            { id: 'water_positive', name: 'Water Surplus', description: 'Achieve water surplus of 100+', condition: () => gameState.water >= 100 },
+            { id: 'happy_citizens', name: 'Happy Citizens', description: 'Achieve 150+ happiness', condition: () => gameState.happiness >= 150 }
+        ];
+
+        function initGame() {
+            createGrid();
+            createBuildingPanels();
+            updateStats();
+            setupCategoryToggle();
+            
+            // Add Ganges river feature
+            addRiverFeature();
+        }
+
+        function createGrid() {
+            const grid = document.getElementById('city-grid');
+            grid.innerHTML = '';
+            
+            for (let i = 0; i < 180; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'grid-cell';
+                cell.dataset.index = i;
+                cell.addEventListener('click', () => placeBuilding(i));
+                cell.addEventListener('mouseenter', (e) => showTooltip(e, i));
+                cell.addEventListener('mouseleave', hideTooltip);
+                grid.appendChild(cell);
+            }
+        }
+
+        function addRiverFeature() {
+            const riverCells = [15, 16, 17, 30, 31, 32, 45, 46, 47, 60, 61, 62];
+            riverCells.forEach(index => {
+                const cell = document.querySelector(`[data-index="${index}"]`);
+                if (cell) {
+                    cell.classList.add('river');
+                    cell.innerHTML = '<div style="font-size: 20px;">🌊</div>';
+                    cell.title = 'Ganges River - Sacred water source';
+                }
+            });
+        }
+
+        function createBuildingPanels() {
+            Object.entries(buildingTypes).forEach(([key, building]) => {
+                const container = document.getElementById(`${building.category}-buildings`);
+                if (container) {
+                    const item = document.createElement('div');
+                    item.className = 'building-item';
+                    item.dataset.type = key;
+                    item.innerHTML = `
+                        <div class="building-icon">${building.icon}</div>
+                        <div class="building-info">
+                            <div class="building-name">${building.name}</div>
+                            <div class="building-effects">
+                                ${building.energy !== 0 ? `⚡${building.energy > 0 ? '+' : ''}${building.energy} ` : ''}
+                                ${building.pollution !== 0 ? `🌫️${building.pollution > 0 ? '+' : ''}${building.pollution} ` : ''}
+                                ${building.water !== 0 ? `💧${building.water > 0 ? '+' : ''}${building.water} ` : ''}
+                                ${building.happiness !== 0 ? `😊${building.happiness > 0 ? '+' : ''}${building.happiness}` : ''}
+                            </div>
+                        </div>
+                    `;
+                    item.addEventListener('click', () => selectBuilding(key));
+                    item.addEventListener('mouseenter', (e) => showBuildingInfo(building));
+                    container.appendChild(item);
+                }
+            });
+        }
+
+        function setupCategoryToggle() {
+            document.querySelectorAll('.category-header').forEach(header => {
+                header.addEventListener('click', () => {
+                    const category = header.parentElement;
+                    const isActive = category.classList.contains('active');
+                    
+                    // Close all categories
+                    document.querySelectorAll('.category').forEach(cat => {
+                        cat.classList.remove('active');
+                        cat.querySelector('span').textContent = '▶';
+                    });
+                    
+                    // Open clicked category if it wasn't active
+                    if (!isActive) {
+                        category.classList.add('active');
+                        header.querySelector('span').textContent = '▼';
+                    }
+                });
+            });
+        }
+
+        function selectBuilding(type) {
+            gameState.selectedBuilding = type;
+            
+            // Update UI
+            document.querySelectorAll('.building-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            document.querySelector(`[data-type="${type}"]`).classList.add('selected');
+            
+            showBuildingInfo(buildingTypes[type]);
+        }
+
+        function placeBuilding(index) {
+            if (!gameState.selectedBuilding) {
+                showNotification('Please select a building type first!');
+                return;
+            }
+
+            const cell = document.querySelector(`[data-index="${index}"]`);
+            if (cell.classList.contains('occupied') || cell.classList.contains('river')) {
+                showNotification('Cannot build here!');
+                return;
+            }
+
+            const building = buildingTypes[gameState.selectedBuilding];
+
+            // Update game state
+            gameState.energy += building.energy;
+            gameState.pollution += building.pollution;
+            gameState.water += building.water;
+            gameState.happiness += building.happiness;
+            gameState.population += building.population;
+
+            const newBuilding = {
+                type: gameState.selectedBuilding,
+                index: index,
+                ...building
+            };
+
+            gameState.buildings.push(newBuilding);
+
+            // Update cell
+            cell.classList.add('occupied');
+            cell.innerHTML = `<div class="building-sprite">${building.icon}</div>`;
+
+            updateStats();
+            checkAchievements();
+            
+            // Show educational info
+            showBuildingInfo(building);
+        }
+
+        function showBuildingInfo(building) {
+            const panel = document.getElementById('info-panel');
+            const title = document.getElementById('info-title');
+            const content = document.getElementById('info-content');
+            
+            title.textContent = building.name;
+            content.innerHTML = `
+                <p><strong>Description:</strong> ${building.description}</p>
+                <br>
+                <p><strong>Environmental Impact:</strong></p>
+                <p>${building.education}</p>
+                <br>
+                <p><strong>Effects:</strong></p>
+                <p>
+                    ${building.energy !== 0 ? `Energy: ${building.energy > 0 ? '+' : ''}${building.energy}<br>` : ''}
+                    ${building.pollution !== 0 ? `Pollution: ${building.pollution > 0 ? '+' : ''}${building.pollution}<br>` : ''}
+                    ${building.water !== 0 ? `Water: ${building.water > 0 ? '+' : ''}${building.water}<br>` : ''}
+                    ${building.happiness !== 0 ? `Happiness: ${building.happiness > 0 ? '+' : ''}${building.happiness}<br>` : ''}
+                    ${building.population !== 0 ? `Population: +${building.population}` : ''}
+                </p>
+            `;
+            
+            panel.classList.add('show');
+            
+            // Auto-hide after 10 seconds
+            setTimeout(() => {
+                panel.classList.remove('show');
+            }, 10000);
+        }
+
+        function updateStats() {
+            document.getElementById('energy').textContent = gameState.energy;
+            document.getElementById('pollution').textContent = gameState.pollution;
+            document.getElementById('water').textContent = gameState.water;
+            document.getElementById('happiness').textContent = gameState.happiness;
+            document.getElementById('population').textContent = gameState.population;
+
+            // Update stat colors
+            updateStatColors();
+        }
+
+        function updateStatColors() {
+            const energyEl = document.getElementById('energy');
+            const pollutionEl = document.getElementById('pollution');
+            const waterEl = document.getElementById('water');
+            const happinessEl = document.getElementById('happiness');
+
+            /* Updated stat colors to use turquoise for positive values */
+            energyEl.style.color = gameState.energy > 0 ? '#40E0D0' : '#ff4444';
+            pollutionEl.style.color = gameState.pollution < 0 ? '#40E0D0' : '#ff4444';
+            waterEl.style.color = gameState.water > 0 ? '#40E0D0' : '#ff4444';
+            happinessEl.style.color = gameState.happiness > 50 ? '#40E0D0' : '#ff4444';
+        }
+
+        function checkAchievements() {
+            achievements.forEach(achievement => {
+                if (!gameState.achievements.includes(achievement.id) && achievement.condition()) {
+                    gameState.achievements.push(achievement.id);
+                    showAchievement(achievement);
+                }
+            });
+        }
+
+        function showAchievement(achievement) {
+            const popup = document.getElementById('achievement-popup');
+            popup.innerHTML = `🏆 ${achievement.name}: ${achievement.description}`;
+            popup.classList.add('show');
+            
+            setTimeout(() => {
+                popup.classList.remove('show');
+            }, 4000);
+        }
+
+        function toggleOverlay(type) {
+            // Remove active class from all overlay buttons
+            document.querySelectorAll('.overlay-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Hide all overlays
+            document.querySelectorAll('.info-overlay').forEach(overlay => {
+                overlay.classList.remove('active');
+            });
+            
+            // If clicking the same overlay, just hide it
+            if (gameState.activeOverlay === type) {
+                gameState.activeOverlay = null;
+                return;
+            }
+            
+            // Show selected overlay
+            gameState.activeOverlay = type;
+            document.getElementById(`${type}-overlay`).classList.add('active');
+            document.querySelector(`[onclick="toggleOverlay('${type}')"]`).classList.add('active');
+        }
+
+        function toggleWeather() {
+            const weatherEffect = document.getElementById('weather-effect');
+            
+            if (gameState.weather === 'clear') {
+                gameState.weather = 'monsoon';
+                weatherEffect.className = 'weather-effect monsoon-rain';
+                
+                // Create rain drops
+                for (let i = 0; i < 20; i++) {
+                    const drop = document.createElement('div');
+                    drop.className = 'rain-drop';
+                    drop.style.left = Math.random() * 100 + '%';
+                    drop.style.animationDelay = Math.random() * 1 + 's';
+                    weatherEffect.appendChild(drop);
+                }
+                
+                // Boost water resources during monsoon
+                gameState.water += 20;
+                updateStats();
+                showNotification('Monsoon season! Water resources increased.');
+            } else {
+                gameState.weather = 'clear';
+                weatherEffect.className = 'weather-effect';
+                weatherEffect.innerHTML = '';
+                showNotification('Clear weather restored.');
+            }
+        }
+
+        function showStats() {
+            const totalBuildings = gameState.buildings.length;
+            const energyBuildings = gameState.buildings.filter(b => buildingTypes[b.type].category === 'energy').length;
+            const treeCount = gameState.buildings.filter(b => ['neem', 'banyan', 'peepal'].includes(b.type)).length;
+            
+            alert(`🇮🇳 City Statistics:
+            
+Population: ${gameState.population}
+Total Buildings: ${totalBuildings}
+Trees Planted: ${treeCount}
+Energy Sources: ${energyBuildings}
+Achievements: ${gameState.achievements.length}/${achievements.length}
+
+Environmental Impact:
+Energy: ${gameState.energy}
+Pollution: ${gameState.pollution}
+Water: ${gameState.water}
+Happiness: ${gameState.happiness}`);
+        }
+
+        function resetCity() {
+            if (confirm('Reset your Indian eco-city? All progress will be lost.')) {
+                gameState = {
+                    energy: 100,
+                    pollution: 0,
+                    water: 50,
+                    happiness: 50,
+                    population: 0,
+                    selectedBuilding: null,
+                    buildings: [],
+                    achievements: [],
+                    weather: 'clear',
+                    activeOverlay: null
+                };
+                
+                initGame();
+                updateStats();
+            }
+        }
+
+        function showTooltip(e, index) {
+            const tooltip = document.getElementById('tooltip');
+            const building = gameState.buildings.find(b => b.index === index);
+            
+            if (building) {
+                tooltip.innerHTML = `${building.name}<br>Click for details`;
+            } else if (gameState.selectedBuilding) {
+                const selectedBuilding = buildingTypes[gameState.selectedBuilding];
+                tooltip.innerHTML = `Place ${selectedBuilding.name}`;
+            } else {
+                tooltip.innerHTML = 'Select a building to place';
+            }
+
+            tooltip.style.left = e.pageX + 10 + 'px';
+            tooltip.style.top = e.pageY - 10 + 'px';
+            tooltip.classList.add('show');
+        }
+
+        function hideTooltip() {
+            document.getElementById('tooltip').classList.remove('show');
+        }
+
+        function showNotification(message) {
+            const popup = document.getElementById('achievement-popup');
+            popup.innerHTML = message;
+            popup.classList.add('show');
+            
+            setTimeout(() => {
+                popup.classList.remove('show');
+            }, 3000);
+        }
+
+        // Initialize game when page loads
+        window.addEventListener('load', initGame);
+         </script>
+        </body>
+</html>
