@@ -1310,5 +1310,12 @@ Happiness: ${gameState.happiness}`);
         // Initialize game when page loads
         window.addEventListener('load', initGame);
          </script>
+           <script>
+         setTimeout(() => {
+  const intro = document.getElementById("game-intro");
+  if (intro) intro.remove();
+}, 6000);
+</script>
         </body>
+
 </html>
