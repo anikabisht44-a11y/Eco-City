@@ -12,8 +12,6 @@ EcoCity Builder is a lightweight, browser-based city-building simulation inspire
 
 📊 Stats Panel – Track pollution, happiness, and population growth.
 
-🎤 Voice Intro – A welcoming British English narration introduces the game.
-
 🌏 Indian Context – Culturally localized icons, buildings, and themes.
 
 🎨 Stylized UI – Soft gradients, animated effects, and a playful interface.
