@@ -1,6 +1,6 @@
 **🌿 EcoCity Builder**
 
-EcoCity Builder is a lightweight, browser-based city-building simulation inspired by SimCity but focused on sustainability and Indian environmental challenges. Players design and grow their own eco-friendly city by balancing pollution, happiness, population, and nature.
+EcoCity Builder is a lightweight, browser-based city-building simulation inspired by SimCity but focused on sustainability and Indian environmental challenges. Players design and grow their own eco-friendly environment.
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
